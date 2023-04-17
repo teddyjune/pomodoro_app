@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
@@ -8,6 +10,19 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  int totalSeconds = 1500;
+  late Timer timer;
+
+  void onTick(Timer timer) {
+    setState(() {
+      totalSeconds = totalSeconds - 1;
+    });
+  }
+
+  void onStartPressed() {
+    timer = Timer.periodic(const Duration(seconds: 1), onTick);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +34,7 @@ class _MainScreenState extends State<MainScreen> {
             child: Container(
               alignment: Alignment.bottomCenter,
               child: Text(
-                "25:00",
+                "$totalSeconds",
                 style: TextStyle(
                   color: Theme.of(context).cardColor,
                   fontSize: 89,
@@ -33,7 +48,7 @@ class _MainScreenState extends State<MainScreen> {
             child: Center(
               child: IconButton(
                 color: Theme.of(context).cardColor,
-                onPressed: () {},
+                onPressed: onStartPressed,
                 icon: const Icon(
                   Icons.play_circle_outline,
                   size: 120,
@@ -48,6 +63,7 @@ class _MainScreenState extends State<MainScreen> {
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
                       color: Theme.of(context).cardColor,
                     ),
                     child: Column(
