@@ -11,13 +11,23 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int totalSeconds = 1500;
-  late Timer timer;
+  Timer? timer;
   bool isRunning = false;
+  int totalPomodoros = 0;
 
   void onTick(Timer timer) {
-    setState(() {
-      totalSeconds = totalSeconds - 1;
-    });
+    // 초기화
+    if (totalSeconds == 0) {
+      setState(() {
+        totalPomodoros = totalPomodoros + 1;
+        isRunning = false;
+        totalSeconds = 1500;
+      });
+    } else {
+      setState(() {
+        totalSeconds = totalSeconds - 1;
+      });
+    }
   }
 
   void onStartPressed() {
@@ -28,10 +38,18 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void onPausePressed() {
-    timer.cancel();
-    setState(() {
-      isRunning = false;
-    });
+    if (timer != null) {
+      timer!.cancel();
+      timer = null;
+      setState(() {
+        isRunning = false;
+      });
+    }
+  }
+
+  String format(int seconds) {
+    Duration duration = Duration(seconds: seconds);
+    return duration.toString().split(".").first.substring(2, 7);
   }
 
   @override
@@ -45,7 +63,7 @@ class _MainScreenState extends State<MainScreen> {
             child: Container(
               alignment: Alignment.bottomCenter,
               child: Text(
-                "$totalSeconds",
+                format(totalSeconds),
                 style: TextStyle(
                   color: Theme.of(context).cardColor,
                   fontSize: 89,
@@ -57,16 +75,20 @@ class _MainScreenState extends State<MainScreen> {
           Flexible(
             flex: 2,
             child: Center(
-              child: IconButton(
-
-                color: Theme.of(context).cardColor,
-                onPressed: isRunning ? onPausePressed : onStartPressed,
-                icon: Icon(
-                  isRunning
-                      ? Icons.pause_circle_outline
-                      : Icons.play_circle_outline,
-                  size: 120,
-                ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    color: Theme.of(context).cardColor,
+                    onPressed: isRunning ? onPausePressed : onStartPressed,
+                    icon: Icon(
+                      isRunning
+                          ? Icons.pause_circle_outline
+                          : Icons.play_circle_outline,
+                      size: 120,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -94,7 +116,7 @@ class _MainScreenState extends State<MainScreen> {
                                   .color),
                         ),
                         Text(
-                          "0",
+                          "$totalPomodoros",
                           style: TextStyle(
                               fontSize: 60,
                               fontWeight: FontWeight.bold,
